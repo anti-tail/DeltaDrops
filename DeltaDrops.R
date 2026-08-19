@@ -14,10 +14,9 @@ library(mapdata)
 
 # 2. 設定 -------------------------------------------------------------------
 # 作業ディレクトリとファイル名を指定してください。
-target_dir <- "./data/" # 入力データの場所
+data_dir <- "./data/" # 入力データの場所
 target_dir <- "./output/" # 出力ファイルの保存先
-input_file <- "" # 入力データファイル名を書いてください．
-output_prefix <- ""　# 出力ファイルのプレフィックスを書いてください．
+output_prefix <- "hogehoge" # 出力ファイルのプレフィックスを書いてください．
 
 # パラメータ設定
 dist_buffer_km <- 30 # Delaunay 網のエッジを切断する距離（km）
@@ -25,11 +24,12 @@ delta_threshold <- 0.486 # δスコアの閾値
 voronoi_buffer_km <- 20 # Voronoi 分割の境界クリップ用バッファ（km）
 
 # 3. データの読み込みと前処理 -------------------------------------------------
-file_path <- file.path(target_dir, input_file)
+# dataディレクトリ内の最初のファイルを自動取得
+file_path <- list.files(data_dir, full.names = TRUE)[1]
 
 # 読み込み（ファイルが存在しない場合はエラーを出して停止します）
-if(!file.exists(file_path)) {
-  stop(paste("エラー: データファイルが見つかりません ->", file_path))
+if(is.na(file_path) || !file.exists(file_path)) {
+  stop("エラー: dataディレクトリにデータファイルが見つかりません")
 }
 
 data <- read_tsv(file_path, show_col_types = FALSE)
@@ -142,10 +142,10 @@ for (i in 1:nrow(core_candidates)) {
   is_overlap <- any(sapply(final_groups, function(g) length(intersect(g, current_core)) > 0))
   if (is_overlap) next
   
-  # 新しい方言群として拡張開始
+  # 新しい変種群として拡張開始
   current_group <- current_core
   
-  # 初期コアの履歴を記録（4つまとめて最初のステップとする）
+  # 初期変種群の履歴を記録（4つまとめて最初のステップとする）
   expansion_history <- rbind(expansion_history, data.frame(
     Group_ID = group_counter,
     Size = 4,
